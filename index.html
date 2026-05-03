@@ -83,10 +83,11 @@
 
   .nav-tab {
     font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
+    font-size: 0.78rem; /* [수정] 0.65rem -> 1.05rem 대폭 확대 */
+    font-weight: 700;   /* 글자를 더 두껍게 */
+    letter-spacing: 0.10em;
     text-transform: uppercase;
-    padding: 0 1.2rem;
+    padding: 0 0.8rem;
     height: 56px;
     display: flex;
     align-items: center;
@@ -312,14 +313,18 @@
   }
 
   .play-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.58rem;
-    padding: 0.15rem 0.5rem;
-    border-radius: 2px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    letter-spacing: 0.05em;
+    display: inline-block;
+    font-size: 0.80rem;      /* [수정] 글자 크기 대폭 키움 (기존 약 0.7rem) */
+    font-weight: 600;        /* [수정] 글자를 더 두껍게 */
+    background: #252530;     /* 박스 배경색 */
+    color: var(--mmorpg);    /* 글자색 (황금색/강조색) */
+    padding: 0.5rem 1rem;    /* [수정] 박스 안쪽 여백을 늘려 크기 키움 */
+    margin-top: 0.8rem;      /* 위쪽 간격 */
+    margin-right: 0.6rem;    /* 태그 사이 간격 */
+    border-radius: 6px;      /* 모서리 살짝 둥글게 */
+    border: 1px solid rgba(255, 204, 51, 0.3); /* [수정] 테두리를 조금 더 진하게 */
+    white-space: nowrap;     /* 글자 줄바꿈 방지 */
+    line-height: 1;          /* 박스 안에서 글자가 중앙에 오도록 */
   }
 
   .play-tag.highlight-mmorpg      { border-color: rgba(212,168,67,0.5);  color: var(--mmorpg);       background: var(--mmorpg-dim); }
@@ -509,7 +514,7 @@
   <div class="genre-header">
     <div>
       <div class="genre-label" style="color:var(--mmorpg)">Genre 01 &mdash; MMORPG</div>
-      <div class="genre-title">대규모 온라인</div>
+      <div class="genre-title">MMORPG</div>
     </div>
     <div class="genre-stats">
       <strong>6</strong>
@@ -543,10 +548,10 @@
       <div class="play-info">
         <div class="play-name">바람의나라</div>
         <div class="play-tags">
-          <span class="play-tag highlight-mmorpg">진인 40/40 승급</span>
-          <span class="play-tag highlight-mmorpg">도삭산 800층</span>
+          <span class="play-tag highlight-mmorpg">진인 체40/마40</span>
+          <span class="play-tag highlight-mmorpg">문파전 참가</span>
           <span class="play-tag">흉노 참가</span>
-          <span class="play-tag">문파전 참가</span>
+          <span class="play-tag">도삭산 800층 참가</span>
           <span class="play-tag">PC</span>
         </div>
       </div>
@@ -574,7 +579,6 @@
         <div class="play-tags">
           <span class="play-tag highlight-mmorpg">레벨 89 / 60%</span>
           <span class="play-tag highlight-mmorpg">약 2천만원 과금</span>
-          <span class="play-tag">이후 무과금 플레이</span>
           <span class="play-tag">Mobile</span>
         </div>
       </div>
@@ -587,7 +591,7 @@
         <div class="play-name">나이트크로우</div>
         <div class="play-tags">
           <span class="play-tag highlight-mmorpg">약 1천만원 과금</span>
-          <span class="play-tag">월던 대공동 이후 무과금 전환</span>
+          <span class="play-tag">월드던전 PVP 참가</span>
           <span class="play-tag">Mobile</span>
         </div>
       </div>
@@ -612,7 +616,7 @@
       <div class="play-info">
         <div class="play-name">로드나인 / RF온라인 / 뱀피르 등</div>
         <div class="play-tags">
-          <span class="play-tag">경쟁작 초기 분석 목적</span>
+          <span class="play-tag highlight-mmorpg">경쟁작 초기 분석 목적</span>
           <span class="play-tag">지원 플레이</span>
           <span class="play-tag">업데이트 트래킹 중 (무과금)</span>
           <span class="play-tag">Mobile / PC</span>
@@ -693,7 +697,7 @@
         <div class="play-name">원신 (Genshin Impact)</div>
         <div class="play-tags">
           <span class="play-tag highlight-adventure">활동일 504일</span>
-          <span class="play-tag highlight-adventure">주력 파티 3종 구축</span>
+          <span class="play-tag">주력 파티 3종 구축</span>
           <span class="play-tag">라이덴 / 아야카 / 타이나리</span>
           <span class="play-tag">PC / Mobile</span>
         </div>
@@ -760,7 +764,6 @@
         <div class="play-tags">
           <span class="play-tag highlight-adventure">20시간</span>
           <span class="play-tag">생활 시뮬레이션</span>
-          <span class="play-tag">얼리 액세스</span>
           <span class="play-tag">PC</span>
         </div>
       </div>
@@ -774,7 +777,6 @@
         <div class="play-tags">
           <span class="play-tag highlight-adventure">전투력 5만</span>
           <span class="play-tag highlight-adventure">어비스 지옥 10단계</span>
-          <span class="play-tag">종료 (컨텐츠 소진)</span>
           <span class="play-tag">Mobile</span>
         </div>
       </div>
@@ -827,8 +829,8 @@
         <div class="play-name">카오스 (Chaos)</div>
         <div class="play-tags">
           <span class="play-tag highlight-competitive">클채 유저</span>
-          <span class="play-tag">나엘 적혈귀 위주</span>
-          <span class="play-tag">언데 래퍼드 위주</span>
+          <span class="play-tag">나엘 적혈귀</span>
+          <span class="play-tag">언데드 래퍼드</span>
           <span class="play-tag">PC</span>
         </div>
       </div>
@@ -841,8 +843,8 @@
         <div class="play-name">League of Legends</div>
         <div class="play-tags">
           <span class="play-tag highlight-competitive">시즌 5~6 다이아</span>
-          <span class="play-tag highlight-competitive">원딜: 시비르, 칼리스타</span>
-          <span class="play-tag highlight-competitive">서폿: 잔나, 모르가나</span>
+          <span class="play-tag">원딜: 시비르, 칼리스타</span>
+          <span class="play-tag">서폿: 잔나, 모르가나</span>
           <span class="play-tag">PC</span>
         </div>
       </div>
@@ -923,9 +925,9 @@
         <div class="play-name">던전앤파이터 모바일</div>
         <div class="play-tags">
           <span class="play-tag highlight-other">만렙 4개</span>
-          <span class="play-tag highlight-other">에반젤 / 블러디아 / 검호 / 마이스터</span>
-          <span class="play-tag highlight-other">사도 / 강림 로터스</span>
           <span class="play-tag">액션 RPG</span>
+          <span class="play-tag">에반젤 / 블러디아 / 검호 / 마이스터</span>
+          <span class="play-tag">사도 / 강림 로터스</span>
           <span class="play-tag">Mobile</span>
         </div>
       </div>

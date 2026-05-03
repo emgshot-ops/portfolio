@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Play Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg2: #111116;
+    --bg3: #18181f;
+    --border: #2a2a35;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --mmorpg: #d4a843;
+    --mmorpg-dim: rgba(212,168,67,0.12);
+    --adventure: #5fb8a0;
+    --adventure-dim: rgba(95,184,160,0.12);
+    --competitive: #5b8fdf;
+    --competitive-dim: rgba(91,143,223,0.12);
+    --other: #c06b8a;
+    --other-dim: rgba(192,107,138,0.12);
+    --summary: #8b7cf6;
+    --summary-dim: rgba(139,124,246,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10,10,12,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    gap: 0;
+    height: 56px;
+  }
+
+  .nav-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.15em;
+    color: var(--text);
+    margin-right: 2.5rem;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem; /* [수정] 0.65rem -> 1.05rem 대폭 확대 */
+    font-weight: 700;   /* 글자를 더 두껍게 */
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 0 0.8rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .nav-tab:hover { color: var(--text); }
+
+  .nav-tab[data-genre="mmorpg"].active   { color: var(--mmorpg);       border-bottom-color: var(--mmorpg); }
+  .nav-tab[data-genre="adventure"].active{ color: var(--adventure);    border-bottom-color: var(--adventure); }
+  .nav-tab[data-genre="competitive"].active{ color: var(--competitive); border-bottom-color: var(--competitive); }
+  .nav-tab[data-genre="other"].active    { color: var(--other);        border-bottom-color: var(--other); }
+  .nav-tab[data-genre="summary"].active  { color: var(--summary);      border-bottom-color: var(--summary); }
+
+  .tab-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    margin-right: 0.4rem;
+    opacity: 0.5;
+  }
+
+  /* ── PAGES ── */
+  .page {
+    display: none;
+    min-height: 100vh;
+    padding: 80px 0 60px;
+    animation: fadeIn 0.35s ease;
+  }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── GENRE PAGE LAYOUT ── */
+  .genre-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* GENRE HEADER */
+  .genre-header {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 1rem;
+  }
+
+  .genre-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    line-height: 1;
+    opacity: 0.07;
+    position: absolute;
+    top: 72px;
+    right: 2rem;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .genre-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .genre-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .genre-stats {
+    text-align: right;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .genre-stats strong {
+    display: block;
+    font-size: 1.6rem;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+    color: var(--text);
+  }
+
+  /* INSIGHT SECTION */
+  .insight-box {
+    border-radius: 4px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .insight-box::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .insight-box .insight-head {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    opacity: 0.7;
+  }
+  .insight-box p {
+    font-size: 0.88rem;
+    line-height: 1.85;
+    color: var(--text);
+    opacity: 0.85;
+  }
+  .insight-box p + p {
+    margin-top: 0.6rem;
+  }
+
+  .insight-mmorpg      { background: var(--mmorpg-dim);      }
+  .insight-mmorpg::before     { background: var(--mmorpg); }
+  .insight-adventure   { background: var(--adventure-dim);   }
+  .insight-adventure::before  { background: var(--adventure); }
+  .insight-competitive { background: var(--competitive-dim); }
+  .insight-competitive::before{ background: var(--competitive); }
+  .insight-other       { background: var(--other-dim);       }
+  .insight-other::before      { background: var(--other); }
+
+  /* PLAY LIST */
+  .play-section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .play-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .play-item {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr auto;
+    align-items: start;
+    gap: 0.8rem 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .play-item::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .play-item:hover {
+    background: var(--bg3);
+  }
+
+  .play-item:hover::after { opacity: 1; }
+
+  .mmorpg-item::after      { background: var(--mmorpg); }
+  .adventure-item::after   { background: var(--adventure); }
+  .competitive-item::after { background: var(--competitive); }
+  .other-item::after       { background: var(--other); }
+
+  .play-item:hover.mmorpg-item      { border-color: rgba(212,168,67,0.3); }
+  .play-item:hover.adventure-item   { border-color: rgba(95,184,160,0.3); }
+  .play-item:hover.competitive-item { border-color: rgba(91,143,223,0.3); }
+  .play-item:hover.other-item       { border-color: rgba(192,107,138,0.3); }
+
+  .play-idx {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: var(--muted);
+    opacity: 0.5;
+    padding-top: 1px;
+    text-align: center;
+  }
+
+  .play-info {}
+
+  .play-name {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .play-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+  }
+
+  .play-tag {
+    display: inline-block;
+    font-size: 0.80rem;      /* [수정] 글자 크기 대폭 키움 (기존 약 0.7rem) */
+    font-weight: 600;        /* [수정] 글자를 더 두껍게 */
+    background: #252530;     /* 박스 배경색 */
+    color: var(--mmorpg);    /* 글자색 (황금색/강조색) */
+    padding: 0.5rem 1rem;    /* [수정] 박스 안쪽 여백을 늘려 크기 키움 */
+    margin-top: 0.8rem;      /* 위쪽 간격 */
+    margin-right: 0.6rem;    /* 태그 사이 간격 */
+    border-radius: 6px;      /* 모서리 살짝 둥글게 */
+    border: 1px solid rgba(255, 204, 51, 0.3); /* [수정] 테두리를 조금 더 진하게 */
+    white-space: nowrap;     /* 글자 줄바꿈 방지 */
+    line-height: 1;          /* 박스 안에서 글자가 중앙에 오도록 */
+  }
+
+  .play-tag.highlight-mmorpg      { border-color: rgba(212,168,67,0.5);  color: var(--mmorpg);       background: var(--mmorpg-dim); }
+  .play-tag.highlight-adventure   { border-color: rgba(95,184,160,0.5);  color: var(--adventure);    background: var(--adventure-dim); }
+  .play-tag.highlight-competitive { border-color: rgba(91,143,223,0.5);  color: var(--competitive);  background: var(--competitive-dim); }
+  .play-tag.highlight-other       { border-color: rgba(192,107,138,0.5); color: var(--other);        background: var(--other-dim); }
+
+  .play-period {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 3px;
+  }
+
+  /* ── SUMMARY PAGE ── */
+  .summary-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .summary-header {
+    padding: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .summary-header .genre-label { color: var(--summary); }
+  .summary-header .genre-title { color: var(--text); }
+
+  .summary-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  thead tr {
+    background: var(--bg3);
+    border-bottom: 2px solid var(--border);
+  }
+
+  th {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg3); }
+
+  td {
+    padding: 0.7rem 1rem;
+    color: var(--text);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  td:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+
+  .td-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .td-period {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .td-achieve {
+    font-size: 0.78rem;
+    color: var(--text);
+    opacity: 0.8;
+  }
+
+  .td-platform {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .badge-pc     { background: rgba(91,143,223,0.15); color: #5b8fdf; border: 1px solid rgba(91,143,223,0.3); }
+  .badge-mobile { background: rgba(95,184,160,0.15); color: #5fb8a0; border: 1px solid rgba(95,184,160,0.3); }
+  .badge-console{ background: rgba(192,107,138,0.15); color: #c06b8a; border: 1px solid rgba(192,107,138,0.3); }
+
+  .genre-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .gb-mmorpg      { background: var(--mmorpg-dim);      color: var(--mmorpg);       border: 1px solid rgba(212,168,67,0.3); }
+  .gb-adventure   { background: var(--adventure-dim);   color: var(--adventure);    border: 1px solid rgba(95,184,160,0.3); }
+  .gb-competitive { background: var(--competitive-dim); color: var(--competitive);  border: 1px solid rgba(91,143,223,0.3); }
+  .gb-other       { background: var(--other-dim);       color: var(--other);        border: 1px solid rgba(192,107,138,0.3); }
+
+  /* group rows */
+  .section-row td {
+    padding: 0.5rem 1rem 0.3rem;
+    background: transparent;
+  }
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+  }
+
+  /* Footer note */
+  .footer-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 1.5rem 0 0.5rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* responsive */
+  @media (max-width: 600px) {
+    .genre-header { grid-template-columns: 1fr; }
+    .genre-stats  { text-align: left; }
+    .genre-title  { font-size: 2rem; }
+    nav { padding: 0 1rem; }
+    .genre-page, .summary-page { padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">GAME PORTFOLIO</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-genre="mmorpg" onclick="showPage('mmorpg',this)">
+      <span class="tab-num">01</span>MMORPG
+    </button>
+    <button class="nav-tab" data-genre="adventure" onclick="showPage('adventure',this)">
+      <span class="tab-num">02</span>어드벤처
+    </button>
+    <button class="nav-tab" data-genre="competitive" onclick="showPage('competitive',this)">
+      <span class="tab-num">03</span>경쟁/전략
+    </button>
+    <button class="nav-tab" data-genre="other" onclick="showPage('other',this)">
+      <span class="tab-num">04</span>기타 장르
+    </button>
+    <button class="nav-tab" data-genre="summary" onclick="showPage('summary',this)">
+      <span class="tab-num">--</span>전체 요약
+    </button>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 01  MMORPG
+═════════════════════════════════════════ -->
+<div id="page-mmorpg" class="page active">
+<div class="genre-page">
+
+  <div class="genre-header">
+    <div>
+      <div class="genre-label" style="color:var(--mmorpg)">Genre 01 &mdash; MMORPG</div>
+      <div class="genre-title">MMORPG</div>
+    </div>
+    <div class="genre-stats">
+      <strong>6</strong>
+      타이틀 플레이
+      <br>2002 &mdash; 2026
+    </div>
+  </div>
+
+  <!-- INSIGHT -->
+  <div class="insight-box insight-mmorpg">
+    <div class="insight-head" style="color:var(--mmorpg)">GENRE INSIGHT</div>
+    <p>
+      2002년 바람의나라를 시작으로 24년간 MMORPG 장르를 지속적으로 경험해왔습니다.
+      PC 기반 WoW에서는 <strong>리치왕의 분노 정공 올클리어</strong>라는 하드코어 목표를 달성했으며,
+      이후 모바일로 이동하여 리니지M, 나이트크로우에서 대규모 과금 이후 무과금 전환을 경험, 
+      <strong>경제 생태계와 과금 설계의 변화</strong>를 유저 입장에서 체감했습니다.
+      로드나인/RF온라인/뱀피르 등은 <strong>경쟁작 분석 목적</strong>으로 초기부터 참여해 무과금 성장 중입니다.
+    </p>
+    <p>
+      2026년 AION2를 통해 리니지라이크 이외의 MMORPG 복귀를 시도 중이며, 
+      장르 내 BM 구조·성장 설계·커뮤니티 역학에 대한 폭넓은 관찰자 시각을 보유하는 것이 목표입니다.
+    </p>
+  </div>
+
+  <!-- LIST -->
+  <div class="play-section-title">PLAY HISTORY</div>
+  <div class="play-list">
+
+    <div class="play-item mmorpg-item">
+      <div class="play-idx">01</div>
+      <div class="play-info">
+        <div class="play-name">바람의나라</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-mmorpg">진인 체40/마40</span>
+          <span class="play-tag highlight-mmorpg">문파전 참가</span>
+          <span class="play-tag">흉노 참가</span>
+          <span class="play-tag">도삭산 800층 참가</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2002 &mdash; 2004</div>
+    </div>
+
+    <div class="play-item mmorpg-item">
+      <div class="play-idx">02</div>
+      <div class="play-info">
+        <div class="play-name">World of Warcraft</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-mmorpg">리치왕의 분노 정공 올클</span>
+          <span class="play-tag">오리지널 ~ 대격변</span>
+          <span class="play-tag">대격변 이후 라이트 전환</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2005 &mdash; 2010</div>
+    </div>
+
+    <div class="play-item mmorpg-item">
+      <div class="play-idx">03</div>
+      <div class="play-info">
+        <div class="play-name">리니지M</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-mmorpg">레벨 89 / 60%</span>
+          <span class="play-tag highlight-mmorpg">약 2천만원 과금</span>
+          <span class="play-tag">Mobile</span>
+        </div>
+      </div>
+      <div class="play-period">2017 &mdash; 2026</div>
+    </div>
+
+    <div class="play-item mmorpg-item">
+      <div class="play-idx">04</div>
+      <div class="play-info">
+        <div class="play-name">나이트크로우</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-mmorpg">약 1천만원 과금</span>
+          <span class="play-tag">월드던전 PVP 참가</span>
+          <span class="play-tag">Mobile</span>
+        </div>
+      </div>
+      <div class="play-period">2023</div>
+    </div>
+
+    <div class="play-item mmorpg-item">
+      <div class="play-idx">05</div>
+      <div class="play-info">
+        <div class="play-name">AION2</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-mmorpg">템렙 2800</span>
+          <span class="play-tag">리니지라이크 외 MMORPG 복귀</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2026</div>
+    </div>
+
+    <div class="play-item mmorpg-item">
+      <div class="play-idx">06</div>
+      <div class="play-info">
+        <div class="play-name">로드나인 / RF온라인 / 뱀피르 등</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-mmorpg">경쟁작 초기 분석 목적</span>
+          <span class="play-tag">지원 플레이</span>
+          <span class="play-tag">업데이트 트래킹 중 (무과금)</span>
+          <span class="play-tag">Mobile / PC</span>
+        </div>
+      </div>
+      <div class="play-period">진행 중</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 02  ADVENTURE
+═════════════════════════════════════════ -->
+<div id="page-adventure" class="page">
+<div class="genre-page">
+
+  <div class="genre-header">
+    <div>
+      <div class="genre-label" style="color:var(--adventure)">Genre 02 &mdash; Adventure / Action RPG</div>
+      <div class="genre-title">어드벤처 &amp; 탐험</div>
+    </div>
+    <div class="genre-stats">
+      <strong>8</strong>
+      타이틀 플레이
+      <br>2006 &mdash; 2026
+    </div>
+  </div>
+
+  <div class="insight-box insight-adventure">
+    <div class="insight-head" style="color:var(--adventure)">GENRE INSIGHT</div>
+    <p>
+      단순 스토리 소비형 플레이에 그치지 않고 <strong>콘텐츠 소진형 플레이어</strong>로 장르에 접근합니다.
+      원신에서 504일 활동 기간 동안 주력 파티 3종 구축, 몬헌2에서 패궁/강궁 노가다 등
+      반복 플레이에서 오는 수치 성장과 빌드 최적화 과정을 즐겨합니다.
+    </p>
+    <p>
+      팰월드·퍼스트 디센던트·호라이즌 제로던 등 다양한 타이틀을 <strong> 플레이하여
+      장르별 콘텐츠 구조를 파악하는 분석형 플레이도 병행했습니다.
+      최근 스팀 게임 시장이 각광을 받고 있는 상황에서, 모바일에만 치중되지 않고 보다 넓은 시야를 가지는 것이 목표입니다.
+    </p>
+  </div>
+
+  <div class="play-section-title">PLAY HISTORY</div>
+  <div class="play-list">
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">01</div>
+      <div class="play-info">
+        <div class="play-name">디제이맥스 1 ~ 피버 시리즈</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">100시간 이상</span>
+          <span class="play-tag">리듬 게임</span>
+          <span class="play-tag">PSP</span>
+        </div>
+      </div>
+      <div class="play-period">2006 &mdash; 2008</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">02</div>
+      <div class="play-info">
+        <div class="play-name">몬스터 헌터 포터블 2</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">100시간 이상</span>
+          <span class="play-tag">패궁 / 강궁 노가다</span>
+          <span class="play-tag">PSP</span>
+        </div>
+      </div>
+      <div class="play-period">2008 &mdash; 2009</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">03</div>
+      <div class="play-info">
+        <div class="play-name">원신 (Genshin Impact)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">활동일 504일</span>
+          <span class="play-tag">주력 파티 3종 구축</span>
+          <span class="play-tag">라이덴 / 아야카 / 타이나리</span>
+          <span class="play-tag">PC / Mobile</span>
+        </div>
+      </div>
+      <div class="play-period">2022 &mdash; 2023</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">04</div>
+      <div class="play-info">
+        <div class="play-name">젤다의 전설: 왕국의 눈물</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">50시간</span>
+          <span class="play-tag">오픈월드 탐험</span>
+          <span class="play-tag">Switch</span>
+        </div>
+      </div>
+      <div class="play-period">2023</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">05</div>
+      <div class="play-info">
+        <div class="play-name">팰월드 (Palworld)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">50시간</span>
+          <span class="play-tag">얼리 액세스 초기 참여</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2024</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">06</div>
+      <div class="play-info">
+        <div class="play-name">퍼스트 디센던트 (The First Descendant)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">50시간</span>
+          <span class="play-tag">출시 초기 참여</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2025</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">07</div>
+      <div class="play-info">
+        <div class="play-name">호라이즌 제로던 (Horizon Zero Dawn)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">30시간</span>
+          <span class="play-tag">리마스터</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2026</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">08</div>
+      <div class="play-info">
+        <div class="play-name">인조이 (inZOI)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">20시간</span>
+          <span class="play-tag">생활 시뮬레이션</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2026</div>
+    </div>
+
+    <div class="play-item adventure-item">
+      <div class="play-idx">09</div>
+      <div class="play-info">
+        <div class="play-name">마비노기 모바일</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-adventure">전투력 5만</span>
+          <span class="play-tag highlight-adventure">어비스 지옥 10단계</span>
+          <span class="play-tag">Mobile</span>
+        </div>
+      </div>
+      <div class="play-period">2025 &mdash; 2026</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 03  COMPETITIVE
+═════════════════════════════════════════ -->
+<div id="page-competitive" class="page">
+<div class="genre-page">
+
+  <div class="genre-header">
+    <div>
+      <div class="genre-label" style="color:var(--competitive)">Genre 03 &mdash; Competitive / Strategy</div>
+      <div class="genre-title">경쟁 &amp; 전략</div>
+    </div>
+    <div class="genre-stats">
+      <strong>4</strong>
+      타이틀 플레이
+      <br>2003 &mdash; 2026
+    </div>
+  </div>
+
+  <div class="insight-box insight-competitive">
+    <div class="insight-head" style="color:var(--competitive)">GENRE INSIGHT</div>
+    <p>
+      다이아 등급 달성(LOL 시즌 5~6, OW 시즌 2~3)이라는 검증된 고강도 경쟁 경험을 보유하고 있습니다.
+      포지션 유연성이 높아 LOL에서는 원딜·서포터, OW에서는 탱커·힐러를 두루 소화했습니다.
+      <strong>팀원과의 호흡 및 역할 분담 이해</strong>가 자연스럽게 체득된 배경입니다.
+    </p>
+    <p>
+      FC온라인에서는 한국/아르헨티나 등 비주류 팀 운영하여 챔피언스 등급을 달성하는 등
+      <strong>대중과 다른 픽 기준, 메타 이외의 플레이 경험</strong>을 쌓았습니다.
+      카오스(2003) 시절부터의 RTS 흐름도 파악하고 있어 전략 게임 계보 전반에 대한 이해도가 있습니다.
+    </p>
+  </div>
+
+  <div class="play-section-title">PLAY HISTORY</div>
+  <div class="play-list">
+
+    <div class="play-item competitive-item">
+      <div class="play-idx">01</div>
+      <div class="play-info">
+        <div class="play-name">카오스 (Chaos)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-competitive">클채 유저</span>
+          <span class="play-tag">나엘 적혈귀</span>
+          <span class="play-tag">언데드 래퍼드</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2003 &mdash; 2004</div>
+    </div>
+
+    <div class="play-item competitive-item">
+      <div class="play-idx">02</div>
+      <div class="play-info">
+        <div class="play-name">League of Legends</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-competitive">시즌 5~6 다이아</span>
+          <span class="play-tag">원딜: 시비르, 칼리스타</span>
+          <span class="play-tag">서폿: 잔나, 모르가나</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2012 &mdash; 2026</div>
+    </div>
+
+    <div class="play-item competitive-item">
+      <div class="play-idx">03</div>
+      <div class="play-info">
+        <div class="play-name">오버워치 (Overwatch)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-competitive">시즌 2~3 다이아</span>
+          <span class="play-tag">탱커: 디바, 윈스턴</span>
+          <span class="play-tag">힐러: 젠야타, 루시우</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2016 &mdash; 2017</div>
+    </div>
+
+    <div class="play-item competitive-item">
+      <div class="play-idx">04</div>
+      <div class="play-info">
+        <div class="play-name">FC온라인 (FC Online)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-competitive">감독모드 챔피언스리그</span>
+          <span class="play-tag">아르헨티나 등 비주류팀 위주</span>
+          <span class="play-tag">PC</span>
+        </div>
+      </div>
+      <div class="play-period">2018 &mdash; 2026</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 04  OTHER
+═════════════════════════════════════════ -->
+<div id="page-other" class="page">
+<div class="genre-page">
+
+  <div class="genre-header">
+    <div>
+      <div class="genre-label" style="color:var(--other)">Genre 04 &mdash; Action / Collection</div>
+      <div class="genre-title">기타 장르</div>
+    </div>
+    <div class="genre-stats">
+      <strong>2</strong>
+      타이틀 플레이
+      <br>2022 &mdash; 2024
+    </div>
+  </div>
+
+  <div class="insight-box insight-other">
+    <div class="insight-head" style="color:var(--other)">GENRE INSIGHT</div>
+    <p>
+      던전앤파이터 모바일에서 만렙 캐릭터 4종 달성과 사도/강림 로터스 공략 경험은
+      <strong>모바일 하드코어 액션 콘텐츠의 난이도 설계와 보상 구조</strong>를 깊이 이해하는 계기가 됐습니다.
+      특히 직업별 특성이 극명히 갈리는 직업(에반젤리스트/블러디아/검호/마이스터)을 다수 경험,
+      유저들이 느껴는 직업 다양성에 대한 체감이 있습니다.
+    </p>
+    <p>
+      붕괴: 스타레일(354일)은 수집형 RPG의 <strong>가챠 설계·육성 스케줄링·스토리 몰입도</strong>를
+      장기적으로 관찰할 수 있었던 케이스입니다. 
+      일일/주간 콘텐츠 사이클과 배너 주기에 대한 유저 입장의 이해도를 높였습니다.
+    </p>
+  </div>
+
+  <div class="play-section-title">PLAY HISTORY</div>
+  <div class="play-list">
+
+    <div class="play-item other-item">
+      <div class="play-idx">01</div>
+      <div class="play-info">
+        <div class="play-name">던전앤파이터 모바일</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-other">만렙 4개</span>
+          <span class="play-tag">액션 RPG</span>
+          <span class="play-tag">에반젤 / 블러디아 / 검호 / 마이스터</span>
+          <span class="play-tag">사도 / 강림 로터스</span>
+          <span class="play-tag">Mobile</span>
+        </div>
+      </div>
+      <div class="play-period">2022</div>
+    </div>
+
+    <div class="play-item other-item">
+      <div class="play-idx">02</div>
+      <div class="play-info">
+        <div class="play-name">붕괴: 스타레일 (Honkai: Star Rail)</div>
+        <div class="play-tags">
+          <span class="play-tag highlight-other">활동일 354일</span>
+          <span class="play-tag">수집형 턴제 RPG</span>
+          <span class="play-tag">가챠 / 육성 설계 관찰</span>
+          <span class="play-tag">PC / Mobile</span>
+        </div>
+      </div>
+      <div class="play-period">2023 &mdash; 2024</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     PAGE 05  SUMMARY TABLE
+═════════════════════════════════════════ -->
+<div id="page-summary" class="page">
+<div class="summary-page">
+
+  <div class="summary-header">
+    <div class="genre-label" style="color:var(--summary)">FULL RECORD &mdash; 전체 플레이 이력</div>
+    <div class="genre-title" style="font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:0.05em;">PLAY HISTORY</div>
+  </div>
+
+  <div class="summary-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>타이틀</th>
+          <th>장르</th>
+          <th>플랫폼</th>
+          <th>기간</th>
+          <th>주요 달성 / 비고</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- MMORPG -->
+        <tr class="section-row">
+          <td colspan="6">
+            <span class="section-label" style="color:var(--mmorpg)">01 MMORPG</span>
+          </td>
+        </tr>
+        <tr>
+          <td>01</td>
+          <td class="td-title">바람의나라</td>
+          <td><span class="genre-badge gb-mmorpg">MMORPG</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2002 &mdash; 2004</td>
+          <td class="td-achieve">진인 40/40 승급 / 도삭산 800층 / 흉노 &amp; 문파전 참가</td>
+        </tr>
+        <tr>
+          <td>02</td>
+          <td class="td-title">World of Warcraft</td>
+          <td><span class="genre-badge gb-mmorpg">MMORPG</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2005 &mdash; 2010</td>
+          <td class="td-achieve">오리지널 시작 / 리치왕의 분노 정공 올클 / 대격변 이후 라이트 유저 전환</td>
+        </tr>
+        <tr>
+          <td>03</td>
+          <td class="td-title">리니지M</td>
+          <td><span class="genre-badge gb-mmorpg">MMORPG</span></td>
+          <td><span class="td-platform badge-mobile">Mobile</span></td>
+          <td class="td-period">2017 &mdash; 2026</td>
+          <td class="td-achieve">Lv.89 60% / 과금 약 2천만원 후 무과금 전환</td>
+        </tr>
+        <tr>
+          <td>04</td>
+          <td class="td-title">나이트크로우</td>
+          <td><span class="genre-badge gb-mmorpg">MMORPG</span></td>
+          <td><span class="td-platform badge-mobile">Mobile</span></td>
+          <td class="td-period">2023</td>
+          <td class="td-achieve">과금 약 1천만원 / 월던 대공동 이후 무과금 전환</td>
+        </tr>
+        <tr>
+          <td>05</td>
+          <td class="td-title">AION2</td>
+          <td><span class="genre-badge gb-mmorpg">MMORPG</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2026</td>
+          <td class="td-achieve">템렙 2800 / PC MMORPG 복귀 게임 </td>
+        </tr>
+        <tr>
+          <td>06</td>
+          <td class="td-title">로드나인 / RF온라인 / 뱀피르 외</td>
+          <td><span class="genre-badge gb-mmorpg">MMORPG</span></td>
+          <td><span class="td-platform badge-mobile">Mobile</span></td>
+          <td class="td-period">진행 중</td>
+          <td class="td-achieve">경쟁작 분석 목적 지원 플레이 / 업데이트 트래킹 (무과금)</td>
+        </tr>
+
+        <!-- ADVENTURE -->
+        <tr class="section-row">
+          <td colspan="6">
+            <span class="section-label" style="color:var(--adventure)">02 ADVENTURE / ACTION RPG</span>
+          </td>
+        </tr>
+        <tr>
+          <td>07</td>
+          <td class="td-title">디제이맥스 1~피버</td>
+          <td><span class="genre-badge gb-adventure">리듬</span></td>
+          <td><span class="td-platform badge-console">PSP</span></td>
+          <td class="td-period">2006 &mdash; 2008</td>
+          <td class="td-achieve">100시간 이상</td>
+        </tr>
+        <tr>
+          <td>08</td>
+          <td class="td-title">몬스터 헌터 포터블 2</td>
+          <td><span class="genre-badge gb-adventure">액션</span></td>
+          <td><span class="td-platform badge-console">PSP</span></td>
+          <td class="td-period">2008 &mdash; 2009</td>
+          <td class="td-achieve">100시간 이상 / 패궁 &amp; 강궁 제작 노가다</td>
+        </tr>
+        <tr>
+          <td>09</td>
+          <td class="td-title">마비노기 모바일</td>
+          <td><span class="genre-badge gb-adventure">MMORPG</span></td>
+          <td><span class="td-platform badge-mobile">Mobile</span></td>
+          <td class="td-period">2025 &mdash; 2026</td>
+          <td class="td-achieve">전투력 5만 / 어비스 지옥 10단계 달성 후 접음</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td class="td-title">원신 (Genshin Impact)</td>
+          <td><span class="genre-badge gb-adventure">오픈월드</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2022 &mdash; 2023</td>
+          <td class="td-achieve">활동일 504일 / 주력 파티 3종 (라이덴 / 아야카 / 타이나리) 운영</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td class="td-title">젤다: 왕국의 눈물</td>
+          <td><span class="genre-badge gb-adventure">오픈월드</span></td>
+          <td><span class="td-platform badge-console">Switch</span></td>
+          <td class="td-period">2023</td>
+          <td class="td-achieve">50시간</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td class="td-title">팰월드</td>
+          <td><span class="genre-badge gb-adventure">액션</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2024</td>
+          <td class="td-achieve">50시간 / 얼리 액세스 초기 참여</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td class="td-title">퍼스트 디센던트</td>
+          <td><span class="genre-badge gb-adventure">슈터 RPG</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2025</td>
+          <td class="td-achieve">50시간</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td class="td-title">호라이즌 제로던</td>
+          <td><span class="genre-badge gb-adventure">액션 RPG</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2026</td>
+          <td class="td-achieve">30시간</td>
+        </tr>
+        <tr>
+          <td>15</td>
+          <td class="td-title">인조이 (inZOI)</td>
+          <td><span class="genre-badge gb-adventure">시뮬레이션</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2026</td>
+          <td class="td-achieve">20시간</td>
+        </tr>
+
+        <!-- COMPETITIVE -->
+        <tr class="section-row">
+          <td colspan="6">
+            <span class="section-label" style="color:var(--competitive)">03 COMPETITIVE / STRATEGY</span>
+          </td>
+        </tr>
+        <tr>
+          <td>16</td>
+          <td class="td-title">카오스</td>
+          <td><span class="genre-badge gb-competitive">RTS/AOS</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2003 &mdash; 2004</td>
+          <td class="td-achieve">클채 유저 / 나엘 적혈귀 &amp; 언데 래퍼드 위주</td>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td class="td-title">League of Legends</td>
+          <td><span class="genre-badge gb-competitive">MOBA</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2012 &mdash; 2026</td>
+          <td class="td-achieve">시즌 5~6 다이아 / 원딜(시비르, 칼리스타) / 서폿(잔나, 모르가나)</td>
+        </tr>
+        <tr>
+          <td>18</td>
+          <td class="td-title">오버워치</td>
+          <td><span class="genre-badge gb-competitive">FPS</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2016 &mdash; 2017</td>
+          <td class="td-achieve">시즌 2~3 다이아 / 탱커(디바, 윈스턴) / 힐러(젠야타, 루시우)</td>
+        </tr>
+        <tr>
+          <td>19</td>
+          <td class="td-title">FC온라인</td>
+          <td><span class="genre-badge gb-competitive">스포츠</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2018 &mdash; 2026</td>
+          <td class="td-achieve">감독모드 챔피언스리그 / 아르헨티나 등 비주류팀 운영</td>
+        </tr>
+
+        <!-- OTHER -->
+        <tr class="section-row">
+          <td colspan="6">
+            <span class="section-label" style="color:var(--other)">04 OTHER (ACTION / COLLECTION)</span>
+          </td>
+        </tr>
+        <tr>
+          <td>20</td>
+          <td class="td-title">던전앤파이터 모바일</td>
+          <td><span class="genre-badge gb-other">액션 RPG</span></td>
+          <td><span class="td-platform badge-mobile">Mobile</span></td>
+          <td class="td-period">2022</td>
+          <td class="td-achieve">만렙 4캐릭 (에반젤/블러디아/검호/마이스터) / 사도 &amp; 강림 로터스</td>
+        </tr>
+        <tr>
+          <td>21</td>
+          <td class="td-title">붕괴: 스타레일</td>
+          <td><span class="genre-badge gb-other">수집형 RPG</span></td>
+          <td><span class="td-platform badge-pc">PC</span></td>
+          <td class="td-period">2023 &mdash; 2024</td>
+          <td class="td-achieve">활동일 354일 / 수집형 게임 운영의 정석 경험</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">TOTAL 21 TITLES &nbsp;&mdash;&nbsp; 2002 ~ 2026 &nbsp;&mdash;&nbsp; GAME PLAY PORTFOLIO</div>
+
+</div>
+</div>
+
+<script>
+  function showPage(genre, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + genre).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
